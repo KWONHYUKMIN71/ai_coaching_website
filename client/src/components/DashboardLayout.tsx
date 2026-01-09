@@ -21,13 +21,14 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, MessageSquare, FileText, TrendingUp } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
-const menuItems = [
+// Default menu items - will be overridden by navItems prop if provided
+const defaultMenuItems = [
   { icon: LayoutDashboard, label: "Page 1", path: "/" },
   { icon: Users, label: "Page 2", path: "/some-path" },
 ];
@@ -37,10 +38,18 @@ const DEFAULT_WIDTH = 280;
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 480;
 
+type NavItem = {
+  href: string;
+  label: string;
+  icon: string;
+};
+
 export default function DashboardLayout({
   children,
+  navItems,
 }: {
   children: React.ReactNode;
+  navItems?: NavItem[];
 }) {
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
@@ -90,7 +99,7 @@ export default function DashboardLayout({
         } as CSSProperties
       }
     >
-      <DashboardLayoutContent setSidebarWidth={setSidebarWidth}>
+      <DashboardLayoutContent setSidebarWidth={setSidebarWidth} navItems={navItems}>
         {children}
       </DashboardLayoutContent>
     </SidebarProvider>
@@ -100,12 +109,28 @@ export default function DashboardLayout({
 type DashboardLayoutContentProps = {
   children: React.ReactNode;
   setSidebarWidth: (width: number) => void;
+  navItems?: NavItem[];
 };
 
 function DashboardLayoutContent({
   children,
   setSidebarWidth,
+  navItems,
 }: DashboardLayoutContentProps) {
+  // Convert navItems to menuItems format
+  const iconMap: Record<string, any> = {
+    "home": LayoutDashboard,
+    "message-square": MessageSquare,
+    "user": Users,
+    "file-text": FileText,
+    "trending-up": TrendingUp,
+  };
+  
+  const menuItems = navItems ? navItems.map(item => ({
+    icon: iconMap[item.icon] || LayoutDashboard,
+    label: item.label,
+    path: item.href,
+  })) : defaultMenuItems;
   const { user, logout } = useAuth();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();

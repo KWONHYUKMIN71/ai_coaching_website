@@ -5,14 +5,83 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import DashboardLayout from "./components/DashboardLayout";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminInquiries from "./pages/AdminInquiries";
+import AdminInstructor from "./pages/AdminInstructor";
+import AdminProposals from "./pages/AdminProposals";
+import AdminAnalytics from "./pages/AdminAnalytics";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/admin"} component={() => (
+        <DashboardLayout
+          navItems={[
+            { href: "/admin", label: "대시보드", icon: "home" },
+            { href: "/admin/inquiries", label: "문의 관리", icon: "message-square" },
+            { href: "/admin/instructor", label: "강사 정보", icon: "user" },
+            { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
+            { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
+          ]}
+        >
+          <AdminDashboard />
+        </DashboardLayout>
+      )} />
+      <Route path={"/admin/inquiries"} component={() => (
+        <DashboardLayout
+          navItems={[
+            { href: "/admin", label: "대시보드", icon: "home" },
+            { href: "/admin/inquiries", label: "문의 관리", icon: "message-square" },
+            { href: "/admin/instructor", label: "강사 정보", icon: "user" },
+            { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
+            { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
+          ]}
+        >
+          <AdminInquiries />
+        </DashboardLayout>
+      )} />
+      <Route path={"/admin/instructor"} component={() => (
+        <DashboardLayout
+          navItems={[
+            { href: "/admin", label: "대시보드", icon: "home" },
+            { href: "/admin/inquiries", label: "문의 관리", icon: "message-square" },
+            { href: "/admin/instructor", label: "강사 정보", icon: "user" },
+            { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
+            { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
+          ]}
+        >
+          <AdminInstructor />
+        </DashboardLayout>
+      )} />
+      <Route path={"/admin/proposals"} component={() => (
+        <DashboardLayout
+          navItems={[
+            { href: "/admin", label: "대시보드", icon: "home" },
+            { href: "/admin/inquiries", label: "문의 관리", icon: "message-square" },
+            { href: "/admin/instructor", label: "강사 정보", icon: "user" },
+            { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
+            { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
+          ]}
+        >
+          <AdminProposals />
+        </DashboardLayout>
+      )} />
+      <Route path={"/admin/analytics"} component={() => (
+        <DashboardLayout
+          navItems={[
+            { href: "/admin", label: "대시보드", icon: "home" },
+            { href: "/admin/inquiries", label: "문의 관리", icon: "message-square" },
+            { href: "/admin/instructor", label: "강사 정보", icon: "user" },
+            { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
+            { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
+          ]}
+        >
+          <AdminAnalytics />
+        </DashboardLayout>
+      )} />
       <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
   );
