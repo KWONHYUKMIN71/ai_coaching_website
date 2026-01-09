@@ -1,0 +1,1 @@
+ALTER TABLE `instructors` ADD `profileLink` varchar(500);

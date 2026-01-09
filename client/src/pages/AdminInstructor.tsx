@@ -15,6 +15,7 @@ export default function AdminInstructor() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [expertise, setExpertise] = useState("");
+  const [profileLink, setProfileLink] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
@@ -50,6 +51,7 @@ export default function AdminInstructor() {
       setEmail(instructor.email || "");
       setPhone(instructor.phone || "");
       setExpertise(instructor.expertise || "");
+      setProfileLink(instructor.profileLink || "");
       setPhotoPreview(instructor.photoUrl || null);
     }
   }, [instructor]);
@@ -92,6 +94,7 @@ export default function AdminInstructor() {
       email,
       phone,
       expertise,
+      profileLink,
     });
   };
 
@@ -203,6 +206,19 @@ export default function AdminInstructor() {
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="010-1234-5678"
               />
+            </div>
+            <div>
+              <Label htmlFor="profileLink">프로필 링크</Label>
+              <Input
+                id="profileLink"
+                type="url"
+                value={profileLink}
+                onChange={(e) => setProfileLink(e.target.value)}
+                placeholder="https://example.com"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                강사 소개 섹션에 표시될 외부 링크 (선택사항)
+              </p>
             </div>
           </CardContent>
         </Card>

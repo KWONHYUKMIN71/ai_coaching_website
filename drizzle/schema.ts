@@ -39,6 +39,7 @@ export const instructors = mysqlTable("instructors", {
   email: varchar("email", { length: 320 }),
   phone: varchar("phone", { length: 50 }),
   expertise: text("expertise"),
+  profileLink: varchar("profileLink", { length: 500 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

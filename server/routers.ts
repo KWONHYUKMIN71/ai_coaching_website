@@ -42,6 +42,7 @@ export const appRouter = router({
         email: z.string().optional(),
         phone: z.string().optional(),
         expertise: z.string().optional(),
+        profileLink: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         return await db.upsertInstructor(input);

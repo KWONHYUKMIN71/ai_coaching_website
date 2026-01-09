@@ -15,6 +15,13 @@
       "when": 1767921143494,
       "tag": "0001_left_bedlam",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1767922321482,
+      "tag": "0002_watery_black_tarantula",
+      "breakpoints": true
     }
   ]
 }

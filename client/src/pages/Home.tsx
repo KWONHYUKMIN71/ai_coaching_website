@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Download, Mail, Phone, User, Briefcase, Users, Sparkles, TrendingUp, Shield, CheckCircle } from "lucide-react";
+import { Download, Mail, Phone, User, Briefcase, Users, Sparkles, TrendingUp, Shield, CheckCircle, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
@@ -291,6 +291,18 @@ export default function Home() {
                           </div>
                         )}
                       </div>
+                      {instructor.profileLink && (
+                        <div className="mt-6">
+                          <Button 
+                            variant="outline" 
+                            size="lg"
+                            onClick={() => window.open(instructor.profileLink!, '_blank')}
+                          >
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            상세 프로필 보기
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
