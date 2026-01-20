@@ -37,6 +37,9 @@ export const translations = {
         viewProfile: "상세 프로필 보기",
         expertise: "전문 분야",
       },
+      aiTrend: {
+        visitButton: "플랫폼 방문하기",
+      },
       inquiry: {
         title: "문의하기",
         subtitle: "AI 코칭에 대해 궁금한 점이 있으신가요? 언제든지 문의해 주세요.",
@@ -142,6 +145,9 @@ export const translations = {
         viewProfile: "查看详细资料",
         expertise: "专业领域",
       },
+      aiTrend: {
+        visitButton: "访问平台",
+      },
       inquiry: {
         title: "咨询",
         subtitle: "对AI辅导有疑问吗？随时联系我们。",
@@ -246,6 +252,9 @@ export const translations = {
         badge: "Instructor",
         viewProfile: "View Detailed Profile",
         expertise: "Areas of Expertise",
+      },
+      aiTrend: {
+        visitButton: "Visit Platform",
       },
       inquiry: {
         title: "Contact Us",

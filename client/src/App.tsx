@@ -12,6 +12,7 @@ import AdminInstructor from "./pages/AdminInstructor";
 import AdminProposals from "./pages/AdminProposals";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import AdminContent from "./pages/AdminContent";
+import AdminAiTrend from "./pages/AdminAiTrend";
 
 function Router() {
   return (
@@ -25,6 +26,7 @@ function Router() {
             { href: "/admin/instructor", label: "강사 정보", icon: "user" },
             { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
             { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
+            { href: "/admin/aitrend", label: "AI 트렌드", icon: "sparkles" },
             { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
           ]}
         >
@@ -39,6 +41,7 @@ function Router() {
             { href: "/admin/instructor", label: "강사 정보", icon: "user" },
             { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
             { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
+            { href: "/admin/aitrend", label: "AI 트렌드", icon: "sparkles" },
             { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
           ]}
         >
@@ -53,6 +56,7 @@ function Router() {
             { href: "/admin/instructor", label: "강사 정보", icon: "user" },
             { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
             { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
+            { href: "/admin/aitrend", label: "AI 트렌드", icon: "sparkles" },
             { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
           ]}
         >
@@ -67,6 +71,7 @@ function Router() {
             { href: "/admin/instructor", label: "강사 정보", icon: "user" },
             { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
             { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
+            { href: "/admin/aitrend", label: "AI 트렌드", icon: "sparkles" },
             { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
           ]}
         >
@@ -81,6 +86,7 @@ function Router() {
             { href: "/admin/instructor", label: "강사 정보", icon: "user" },
             { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
             { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
+            { href: "/admin/aitrend", label: "AI 트렌드", icon: "sparkles" },
             { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
           ]}
         >
@@ -95,10 +101,26 @@ function Router() {
             { href: "/admin/instructor", label: "강사 정보", icon: "user" },
             { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
             { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
+            { href: "/admin/aitrend", label: "AI 트렌드", icon: "sparkles" },
             { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
           ]}
         >
           <AdminContent />
+        </DashboardLayout>
+      )} />
+      <Route path={"/admin/aitrend"} component={() => (
+        <DashboardLayout
+          navItems={[
+            { href: "/admin", label: "대시보드", icon: "home" },
+            { href: "/admin/inquiries", label: "문의 관리", icon: "message-square" },
+            { href: "/admin/instructor", label: "강사 정보", icon: "user" },
+            { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
+            { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
+            { href: "/admin/aitrend", label: "AI 트렌드", icon: "sparkles" },
+            { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
+          ]}
+        >
+          <AdminAiTrend />
         </DashboardLayout>
       )} />
       <Route path={"/404"} component={NotFound} />

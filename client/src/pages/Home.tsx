@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Download, Mail, Phone, User, ExternalLink } from "lucide-react";
+import { Download, Mail, Phone, User, ExternalLink, Sparkles } from "lucide-react";
 
 export default function Home() {
   const { language, t } = useLanguage();
@@ -41,6 +41,7 @@ export default function Home() {
     { sectionId: corporateSection?.id || 0 },
     { enabled: !!corporateSection?.id }
   );
+  const aiTrendQuery = trpc.aiTrend.get.useQuery();
 
   // Log page visit
   useEffect(() => {
@@ -329,6 +330,39 @@ export default function Home() {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* AI Trend Section */}
+      {aiTrendQuery.data && (
+        <section id="aitrend" className="py-20 bg-gradient-to-br from-primary/5 via-background to-primary/5">
+          <div className="container">
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="mb-8">
+                <Badge className="mb-4" variant="secondary">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  AI Trends
+                </Badge>
+                <h2 className="text-4xl font-bold mb-4">
+                  {language === 'ko' ? aiTrendQuery.data.titleKo : language === 'zh' ? aiTrendQuery.data.titleZh : aiTrendQuery.data.titleEn}
+                </h2>
+                <p className="text-xl text-muted-foreground mb-8">
+                  {language === 'ko' ? aiTrendQuery.data.subtitleKo : language === 'zh' ? aiTrendQuery.data.subtitleZh : aiTrendQuery.data.subtitleEn}
+                </p>
+              </div>
+
+              {aiTrendQuery.data.linkUrl && (
+                <Button 
+                  size="lg"
+                  className="gap-2"
+                  onClick={() => window.open(aiTrendQuery.data!.linkUrl!, "_blank")}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  {t("home.aiTrend.visitButton")}
+                </Button>
+              )}
             </div>
           </div>
         </section>

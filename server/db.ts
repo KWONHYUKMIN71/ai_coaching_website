@@ -12,7 +12,8 @@ import {
   activityLogs,
   InsertActivityLog,
   contentSections,
-  contentItems
+  contentItems,
+  aiTrendSection
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -341,4 +342,25 @@ export async function updateContentItem(
       updatedAt: new Date(),
     })
     .where(eq(contentItems.id, id));
+}
+
+
+// ============================================
+// AI Trend Section Helpers
+// ============================================
+
+export async function getAiTrendSection() {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(aiTrendSection).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function updateAiTrendSection(data: Partial<typeof aiTrendSection.$inferInsert> & { id: number }) {
+  const db = await getDb();
+  if (!db) return;
+  
+  const { id, ...updateData } = data;
+  await db.update(aiTrendSection).set(updateData).where(eq(aiTrendSection.id, id));
 }

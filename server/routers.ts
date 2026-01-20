@@ -281,6 +281,29 @@ ${input.message}
         return await db.getActivityStats(input.startDate, input.endDate);
       }),
   }),
+
+  // AI Trend Section router
+  aiTrend: router({
+    get: publicProcedure.query(async () => {
+      return await db.getAiTrendSection();
+    }),
+    
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        titleKo: z.string().optional(),
+        titleZh: z.string().optional(),
+        titleEn: z.string().optional(),
+        subtitleKo: z.string().optional(),
+        subtitleZh: z.string().optional(),
+        subtitleEn: z.string().optional(),
+        linkUrl: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateAiTrendSection(input);
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

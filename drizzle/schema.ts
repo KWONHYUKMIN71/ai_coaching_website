@@ -163,3 +163,24 @@ export const contentItems = mysqlTable("contentItems", {
 
 export type ContentItem = typeof contentItems.$inferSelect;
 export type InsertContentItem = typeof contentItems.$inferInsert;
+
+
+/**
+ * AI Trend Section table
+ * Stores AI trend section information with multilingual support
+ */
+export const aiTrendSection = mysqlTable("aiTrendSection", {
+  id: int("id").autoincrement().primaryKey(),
+  titleKo: text("titleKo"),
+  titleZh: text("titleZh"),
+  titleEn: text("titleEn"),
+  subtitleKo: text("subtitleKo"),
+  subtitleZh: text("subtitleZh"),
+  subtitleEn: text("subtitleEn"),
+  linkUrl: varchar("linkUrl", { length: 500 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AiTrendSection = typeof aiTrendSection.$inferSelect;
+export type InsertAiTrendSection = typeof aiTrendSection.$inferInsert;

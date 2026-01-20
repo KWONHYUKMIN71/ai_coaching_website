@@ -127,3 +127,14 @@
 - [x] 관리자 강사 정보 페이지에 다국어 입력 폼 추가
 - [x] 메인 페이지 강사 소개 섹션에 다국어 표시 적용
 - [x] 데이터베이스 마이그레이션 및 초기 데이터 업데이트
+
+
+## AI 트렌드 섹션 추가 (2026-01-20)
+- [x] aiTrendSection 테이블 생성 (titleKo/Zh/En, subtitleKo/Zh/En, linkUrl)
+- [x] 데이터베이스 마이그레이션 실행
+- [x] 초기 AI 트렌드 데이터 삽입 (https://ai-trend-platform.fplusai.biz/)
+- [x] 관리자 AI 트렌드 관리 페이지 생성
+- [x] 메인 페이지에 AI 트렌드 섹션 추가 (강사 소개와 문의 사이)
+- [x] tRPC 프로시저 추가 (aiTrend.get, aiTrend.update)
+- [x] vitest 테스트 작성 및 검증
+- [ ] 최종 체크포인트 생성
