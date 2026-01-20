@@ -11,6 +11,7 @@ import AdminInquiries from "./pages/AdminInquiries";
 import AdminInstructor from "./pages/AdminInstructor";
 import AdminProposals from "./pages/AdminProposals";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import AdminContent from "./pages/AdminContent";
 
 function Router() {
   return (
@@ -23,6 +24,7 @@ function Router() {
             { href: "/admin/inquiries", label: "문의 관리", icon: "message-square" },
             { href: "/admin/instructor", label: "강사 정보", icon: "user" },
             { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
+            { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
             { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
           ]}
         >
@@ -36,6 +38,7 @@ function Router() {
             { href: "/admin/inquiries", label: "문의 관리", icon: "message-square" },
             { href: "/admin/instructor", label: "강사 정보", icon: "user" },
             { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
+            { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
             { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
           ]}
         >
@@ -49,6 +52,7 @@ function Router() {
             { href: "/admin/inquiries", label: "문의 관리", icon: "message-square" },
             { href: "/admin/instructor", label: "강사 정보", icon: "user" },
             { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
+            { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
             { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
           ]}
         >
@@ -62,6 +66,7 @@ function Router() {
             { href: "/admin/inquiries", label: "문의 관리", icon: "message-square" },
             { href: "/admin/instructor", label: "강사 정보", icon: "user" },
             { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
+            { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
             { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
           ]}
         >
@@ -75,10 +80,25 @@ function Router() {
             { href: "/admin/inquiries", label: "문의 관리", icon: "message-square" },
             { href: "/admin/instructor", label: "강사 정보", icon: "user" },
             { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
+            { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
             { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
           ]}
         >
           <AdminAnalytics />
+        </DashboardLayout>
+      )} />
+      <Route path={"/admin/content"} component={() => (
+        <DashboardLayout
+          navItems={[
+            { href: "/admin", label: "대시보드", icon: "home" },
+            { href: "/admin/inquiries", label: "문의 관리", icon: "message-square" },
+            { href: "/admin/instructor", label: "강사 정보", icon: "user" },
+            { href: "/admin/proposals", label: "제안서 관리", icon: "file-text" },
+            { href: "/admin/content", label: "콘텐츠 관리", icon: "layout" },
+            { href: "/admin/analytics", label: "접속 현황", icon: "trending-up" },
+          ]}
+        >
+          <AdminContent />
         </DashboardLayout>
       )} />
       <Route path={"/404"} component={NotFound} />

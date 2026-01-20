@@ -6,6 +6,7 @@ import { z } from "zod";
 import * as db from "./db";
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
+import { notifyOwner } from "./_core/notification";
 
 export const appRouter = router({
   system: systemRouter,
@@ -135,6 +136,29 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const id = await db.createInquiry(input);
+        
+        // Send notification to owner
+        const inquiryTypeLabel = input.type === "personal" ? "개인 코칭" : "기업 코칭";
+        const notificationTitle = `[AI코칭 문의] ${inquiryTypeLabel}`;
+        const notificationContent = `
+이름: ${input.name}
+이메일: ${input.email}
+전화번호: ${input.phone || '미입력'}
+
+문의 내용:
+${input.message}
+        `.trim();
+        
+        try {
+          await notifyOwner({
+            title: notificationTitle,
+            content: notificationContent,
+          });
+        } catch (error) {
+          console.error('[Inquiry] Failed to send notification:', error);
+          // Don't fail the inquiry creation if notification fails
+        }
+        
         return { id };
       }),
     
@@ -146,6 +170,58 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         await db.updateInquiryStatus(input.id, input.status, input.adminNotes);
+        return { success: true };
+      }),
+  }),
+
+  // Content router
+  content: router({
+    getSections: publicProcedure.query(async () => {
+      return await db.getAllContentSections();
+    }),
+    
+    getSectionByType: publicProcedure
+      .input(z.object({ type: z.enum(["personal", "corporate"]) }))
+      .query(async ({ input }) => {
+        return await db.getContentSectionByType(input.type);
+      }),
+    
+    getItemsBySectionId: publicProcedure
+      .input(z.object({ sectionId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getContentItemsBySectionId(input.sectionId);
+      }),
+    
+    updateSection: protectedProcedure
+      .input(z.object({
+        type: z.enum(["personal", "corporate"]),
+        titleKo: z.string(),
+        titleZh: z.string(),
+        titleEn: z.string(),
+        descriptionKo: z.string(),
+        descriptionZh: z.string(),
+        descriptionEn: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { type, ...data } = input;
+        await db.updateContentSection(type, data);
+        return { success: true };
+      }),
+    
+    updateItem: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        iconName: z.string(),
+        titleKo: z.string(),
+        titleZh: z.string(),
+        titleEn: z.string(),
+        contentKo: z.string(),
+        contentZh: z.string(),
+        contentEn: z.string(),
+        displayOrder: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateContentItem(input.id, input);
         return { success: true };
       }),
   }),

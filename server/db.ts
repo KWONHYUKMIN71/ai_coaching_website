@@ -10,7 +10,9 @@ import {
   inquiries,
   InsertInquiry,
   activityLogs,
-  InsertActivityLog
+  InsertActivityLog,
+  contentSections,
+  contentItems
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -238,4 +240,105 @@ export async function getActivityStats(startDate: Date, endDate: Date) {
     uniqueIps: uniqueIps.size,
     pageViews,
   };
+}
+
+
+// ==================== Content Management ====================
+
+/**
+ * 모든 콘텐츠 섹션 조회
+ */
+export async function getAllContentSections() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(contentSections)
+    .where(eq(contentSections.isActive, "active"))
+    .orderBy(contentSections.displayOrder);
+}
+
+/**
+ * 특정 타입의 콘텐츠 섹션 조회
+ */
+export async function getContentSectionByType(type: "personal" | "corporate") {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db
+    .select()
+    .from(contentSections)
+    .where(eq(contentSections.sectionType, type))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+/**
+ * 특정 섹션의 콘텐츠 항목 조회
+ */
+export async function getContentItemsBySectionId(sectionId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(contentItems)
+    .where(eq(contentItems.sectionId, sectionId))
+    .orderBy(contentItems.displayOrder);
+}
+
+/**
+ * 콘텐츠 섹션 업데이트
+ */
+export async function updateContentSection(
+  type: "personal" | "corporate",
+  data: {
+    titleKo: string;
+    titleZh: string;
+    titleEn: string;
+    descriptionKo: string;
+    descriptionZh: string;
+    descriptionEn: string;
+  }
+) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db
+    .update(contentSections)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(contentSections.sectionType, type));
+}
+
+/**
+ * 콘텐츠 항목 업데이트
+ */
+export async function updateContentItem(
+  id: number,
+  data: {
+    iconName: string;
+    titleKo: string;
+    titleZh: string;
+    titleEn: string;
+    contentKo: string;
+    contentZh: string;
+    contentEn: string;
+    displayOrder?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db
+    .update(contentItems)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(contentItems.id, id));
 }

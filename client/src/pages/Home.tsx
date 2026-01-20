@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { DynamicIcon } from "@/components/DynamicIcon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -7,22 +10,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Download, Mail, Phone, User, Briefcase, Users, Sparkles, TrendingUp, Shield, CheckCircle, ExternalLink } from "lucide-react";
-import { Link } from "wouter";
+import { Download, Mail, Phone, User, ExternalLink } from "lucide-react";
 
 export default function Home() {
+  const { language, t } = useLanguage();
   const [isInquiryOpen, setIsInquiryOpen] = useState(false);
   const [inquiryType, setInquiryType] = useState<"personal" | "corporate">("personal");
   
+  // Data queries
   const instructorsQuery = trpc.instructor.getAll.useQuery();
   const proposalsQuery = trpc.proposal.getAll.useQuery();
+  const contentSectionsQuery = trpc.content.getSections.useQuery();
   const createInquiryMutation = trpc.inquiry.create.useMutation();
   const logActivityMutation = trpc.activity.log.useMutation();
 
   const instructor = instructorsQuery.data?.[0];
   const personalProposal = proposalsQuery.data?.find(p => p.type === "personal");
   const corporateProposal = proposalsQuery.data?.find(p => p.type === "corporate");
+  const personalSection = contentSectionsQuery.data?.find(s => s.sectionType === "personal");
+  const corporateSection = contentSectionsQuery.data?.find(s => s.sectionType === "corporate");
+
+  // Content items queries
+  const personalItemsQuery = trpc.content.getItemsBySectionId.useQuery(
+    { sectionId: personalSection?.id || 0 },
+    { enabled: !!personalSection?.id }
+  );
+  const corporateItemsQuery = trpc.content.getItemsBySectionId.useQuery(
+    { sectionId: corporateSection?.id || 0 },
+    { enabled: !!corporateSection?.id }
+  );
 
   // Log page visit
   useEffect(() => {
@@ -47,7 +65,7 @@ export default function Home() {
         message: formData.get("message") as string,
       });
       
-      toast.success("문의가 성공적으로 접수되었습니다!");
+      toast.success(t("home.inquiry.success"));
       setIsInquiryOpen(false);
       e.currentTarget.reset();
       
@@ -57,7 +75,7 @@ export default function Home() {
         action: "inquiry_submitted",
       });
     } catch (error) {
-      toast.error("문의 접수에 실패했습니다. 다시 시도해주세요.");
+      toast.error(t("home.inquiry.error"));
     }
   };
 
@@ -73,15 +91,63 @@ export default function Home() {
     }
   };
 
+  // Get translated content
+  const getTitle = (section: typeof personalSection) => {
+    if (!section) return "";
+    return language === "ko" ? section.titleKo : language === "zh" ? section.titleZh : section.titleEn;
+  };
+
+  const getDescription = (section: typeof personalSection) => {
+    if (!section) return "";
+    return language === "ko" ? section.descriptionKo : language === "zh" ? section.descriptionZh : section.descriptionEn;
+  };
+
+  const getItemTitle = (item: any) => {
+    if (!item) return "";
+    return language === "ko" ? item.titleKo : language === "zh" ? item.titleZh : item.titleEn;
+  };
+
+  const getItemContent = (item: any) => {
+    if (!item) return "";
+    return language === "ko" ? item.contentKo : language === "zh" ? item.contentZh : item.contentEn;
+  };
+
   return (
     <div className="min-h-screen">
+      {/* Navigation */}
+      <nav className="bg-background border-b sticky top-0 z-50">
+        <div className="container flex items-center justify-between py-4">
+          <h1 className="text-2xl font-bold text-primary">AI Coaching</h1>
+          <div className="flex items-center gap-6">
+            <a href="#personal" className="text-sm font-medium hover:text-primary transition-colors">
+              {t("nav.personalCoaching")}
+            </a>
+            <a href="#corporate" className="text-sm font-medium hover:text-primary transition-colors">
+              {t("nav.corporateCoaching")}
+            </a>
+            <a href="#instructor" className="text-sm font-medium hover:text-primary transition-colors">
+              {t("nav.instructor")}
+            </a>
+            <Button 
+              variant="default" 
+              size="sm"
+              onClick={() => setIsInquiryOpen(true)}
+            >
+              {t("nav.inquiry")}
+            </Button>
+            <LanguageSwitcher />
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary via-primary/90 to-primary/80 text-primary-foreground py-20">
         <div className="container">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl font-bold mb-6">AI 코칭으로 새로운 시대를 열다</h1>
+            <h1 className="text-5xl font-bold mb-6">{t("home.hero.title")}</h1>
+            <p className="text-2xl mb-4 font-semibold">{t("home.hero.subtitle")}</p>
             <p className="text-xl mb-8 opacity-90">
-              개인과 기업의 성공적인 AI 도입을 위한 맞춤형 코칭 서비스
+              {t("home.hero.description")}
             </p>
             <div className="flex gap-4 justify-center">
               <Button 
@@ -92,7 +158,7 @@ export default function Home() {
                   setIsInquiryOpen(true);
                 }}
               >
-                개인 코칭 문의하기
+                {t("home.hero.ctaPersonal")}
               </Button>
               <Button 
                 size="lg" 
@@ -103,7 +169,7 @@ export default function Home() {
                   setIsInquiryOpen(true);
                 }}
               >
-                기업 코칭 문의하기
+                {t("home.hero.ctaCorporate")}
               </Button>
             </div>
           </div>
@@ -111,132 +177,82 @@ export default function Home() {
       </section>
 
       {/* Personal Coaching Section */}
-      <section className="py-20 bg-background">
+      <section id="personal" className="py-20 bg-background">
         <div className="container">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4 text-foreground">개인 코칭</h2>
-              <p className="text-xl text-muted-foreground">당신이 중심입니다: 코칭의 3가지 원칙</p>
+              <Badge className="mb-4" variant="secondary">{t("home.personalCoaching.badge")}</Badge>
+              <h2 className="text-4xl font-bold mb-4">{getTitle(personalSection)}</h2>
+              <p className="text-xl text-muted-foreground mb-6">
+                {getDescription(personalSection)}
+              </p>
+              {personalProposal && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleDownload("personal")}
+                  className="gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  {t("home.personalCoaching.downloadProposal")}
+                </Button>
+              )}
             </div>
-            
-            <div className="grid md:grid-cols-3 gap-8 mb-12">
-              <Card>
-                <CardHeader>
-                  <User className="w-12 h-12 mb-4 text-primary" />
-                  <CardTitle>개인의 목적과 사고 구조 먼저 정리</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    도구는 그 다음 문제입니다. 당신의 생각의 흐름을 파악하는 것이 우선입니다.
-                  </CardDescription>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CheckCircle className="w-12 h-12 mb-4 text-primary" />
-                  <CardTitle>"지금 AI가 필요한지"부터 판단</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    AI가 만능 해결책은 아닙니다. 현재 상황에서 AI 도입이 정말 효과적인지부터 함께 진단합니다.
-                  </CardDescription>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <TrendingUp className="w-12 h-12 mb-4 text-primary" />
-                  <CardTitle>필요할 때마다 다음 단계로 진행</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    1차 미팅 후, 상호 필요성이 인정될 때만 다음 단계를 제안합니다. 불필요한 과정을 강요하지 않습니다.
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            </div>
-            
-            <div className="text-center">
-              <Button 
-                size="lg" 
-                onClick={() => handleDownload("personal")}
-                disabled={!personalProposal}
-              >
-                <Download className="mr-2 h-5 w-5" />
-                개인 코칭 제안서 다운로드
-              </Button>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {personalItemsQuery.data?.map((item) => (
+                <Card key={item.id} className="border-2 hover:border-primary transition-colors">
+                  <CardHeader>
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                      <DynamicIcon name={item.iconName as any} className="h-6 w-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-xl">{getItemTitle(item)}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{getItemContent(item)}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
       {/* Corporate Coaching Section */}
-      <section className="py-20 bg-muted/30">
+      <section id="corporate" className="py-20 bg-muted/50">
         <div className="container">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4 text-foreground">기업 코칭</h2>
-              <p className="text-xl text-muted-foreground">기업의 AI, 새로운 시대를 열다</p>
+              <Badge className="mb-4" variant="secondary">{t("home.corporateCoaching.badge")}</Badge>
+              <h2 className="text-4xl font-bold mb-4">{getTitle(corporateSection)}</h2>
+              <p className="text-xl text-muted-foreground mb-6">
+                {getDescription(corporateSection)}
+              </p>
+              {corporateProposal && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleDownload("corporate")}
+                  className="gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  {t("home.corporateCoaching.downloadProposal")}
+                </Button>
+              )}
             </div>
-            
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <Card>
-                <CardHeader>
-                  <Sparkles className="w-12 h-12 mb-4 text-primary" />
-                  <CardTitle>AI 트렌드 변화</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">2023년</h4>
-                    <p className="text-sm text-muted-foreground">ChatGPT 중심의 단순 질의응답 (Q&A) 수준</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">현재</h4>
-                    <p className="text-sm text-muted-foreground">Claude, Google 등 생성 품질이 고도화된 모델의 등장</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">미래</h4>
-                    <p className="text-sm text-muted-foreground">AGENT 기반의 '실행형 AI'가 기업 활용의 핵심으로 부상</p>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <Briefcase className="w-12 h-12 mb-4 text-primary" />
-                  <CardTitle>기회와 고민 사이</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-start gap-2">
-                    <Shield className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <p className="text-sm">이런 강력한 AI 도구가 정말 있는가?</p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Shield className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <p className="text-sm">가장 중요한 내부 데이터 보안은 괜찮을까?</p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Users className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <p className="text-sm">우리 직원들이 직접 사용할 수 있을까?</p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <TrendingUp className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <p className="text-sm">비용과 성공을 보장할 수 있나?</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            
-            <div className="text-center">
-              <Button 
-                size="lg" 
-                onClick={() => handleDownload("corporate")}
-                disabled={!corporateProposal}
-              >
-                <Download className="mr-2 h-5 w-5" />
-                기업 코칭 제안서 다운로드
-              </Button>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {corporateItemsQuery.data?.map((item) => (
+                <Card key={item.id} className="border-2 hover:border-primary transition-colors">
+                  <CardHeader>
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                      <DynamicIcon name={item.iconName as any} className="h-6 w-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-xl">{getItemTitle(item)}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{getItemContent(item)}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </div>
@@ -244,168 +260,164 @@ export default function Home() {
 
       {/* Instructor Section */}
       {instructor && (
-        <section className="py-20 bg-background">
+        <section id="instructor" className="py-20 bg-background">
           <div className="container">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold mb-4 text-foreground">강사 소개</h2>
+                <Badge className="mb-4" variant="secondary">{t("home.instructor.badge")}</Badge>
+                <h2 className="text-4xl font-bold mb-4">{instructor.name}</h2>
+                {instructor.title && (
+                  <p className="text-xl text-muted-foreground mb-4">{instructor.title}</p>
+                )}
               </div>
-              
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-                    {instructor.photoUrl && (
-                      <img 
-                        src={instructor.photoUrl} 
-                        alt={instructor.name}
-                        className="w-48 h-48 rounded-lg object-cover shadow-lg"
-                      />
-                    )}
-                    <div className="flex-1">
-                      <h3 className="text-3xl font-bold mb-2">{instructor.name}</h3>
-                      {instructor.title && (
-                        <p className="text-xl text-muted-foreground mb-4">{instructor.title}</p>
-                      )}
-                      {instructor.bio && (
-                        <p className="text-base mb-6 leading-relaxed">{instructor.bio}</p>
-                      )}
-                      {instructor.expertise && (
-                        <div className="mb-6">
-                          <h4 className="font-semibold mb-2">전문 분야</h4>
-                          <p className="text-sm text-muted-foreground">{instructor.expertise}</p>
-                        </div>
-                      )}
-                      <div className="flex flex-col gap-2">
-                        {instructor.email && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Mail className="w-4 h-4 text-primary" />
-                            <a href={`mailto:${instructor.email}`} className="hover:underline">
-                              {instructor.email}
-                            </a>
-                          </div>
-                        )}
-                        {instructor.phone && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Phone className="w-4 h-4 text-primary" />
-                            <span>{instructor.phone}</span>
-                          </div>
-                        )}
-                      </div>
-                      {instructor.profileLink && (
-                        <div className="mt-6">
-                          <Button 
-                            variant="outline" 
-                            size="lg"
-                            onClick={() => window.open(instructor.profileLink!, '_blank')}
-                          >
-                            <ExternalLink className="mr-2 h-4 w-4" />
-                            상세 프로필 보기
-                          </Button>
-                        </div>
-                      )}
-                    </div>
+
+              <div className="flex flex-col md:flex-row gap-8 items-center">
+                {instructor.photoUrl && (
+                  <div className="flex-shrink-0">
+                    <img 
+                      src={instructor.photoUrl} 
+                      alt={instructor.name}
+                      className="w-64 h-64 object-cover rounded-lg shadow-lg"
+                    />
                   </div>
-                </CardContent>
-              </Card>
+                )}
+                
+                <div className="flex-1">
+                  {instructor.bio && (
+                    <p className="text-lg text-muted-foreground mb-6 whitespace-pre-wrap">
+                      {instructor.bio}
+                    </p>
+                  )}
+                  
+                  {instructor.expertise && (
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-2">전문 분야</h3>
+                      <p className="text-muted-foreground">{instructor.expertise}</p>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-2">
+                    {instructor.email && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Mail className="h-4 w-4" />
+                        <span>{instructor.email}</span>
+                      </div>
+                    )}
+                    {instructor.phone && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Phone className="h-4 w-4" />
+                        <span>{instructor.phone}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {instructor.profileLink && (
+                    <Button 
+                      variant="outline" 
+                      className="mt-6 gap-2"
+                      onClick={() => window.open(instructor.profileLink!, "_blank")}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      {t("home.instructor.viewProfile")}
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </section>
       )}
 
-      {/* CTA Section */}
-      <section className="py-20 bg-primary text-primary-foreground">
-        <div className="container">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-6">지금 바로 시작하세요</h2>
-            <p className="text-xl mb-8 opacity-90">
-              개인 또는 기업의 AI 도입을 위한 맞춤형 코칭을 받아보세요
-            </p>
-            <Button 
-              size="lg" 
-              variant="secondary"
-              onClick={() => setIsInquiryOpen(true)}
-            >
-              무료 상담 신청하기
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-8 bg-muted/50 border-t">
-        <div className="container">
-          <div className="text-center text-sm text-muted-foreground">
-            <p>© 2026 AI 코칭 서비스. All rights reserved.</p>
-            {instructor?.email && (
-              <p className="mt-2">
-                문의: <a href={`mailto:${instructor.email}`} className="hover:underline">{instructor.email}</a>
-              </p>
-            )}
-          </div>
-        </div>
-      </footer>
-
       {/* Inquiry Dialog */}
       <Dialog open={isInquiryOpen} onOpenChange={setIsInquiryOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>문의하기</DialogTitle>
+            <DialogTitle>{t("home.inquiry.title")}</DialogTitle>
             <DialogDescription>
-              문의 사항을 남겨주시면 빠른 시일 내에 연락드리겠습니다.
+              {t("home.inquiry.subtitle")}
             </DialogDescription>
           </DialogHeader>
           
           <form onSubmit={handleInquirySubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="inquiry-type">문의 유형</Label>
-              <Select value={inquiryType} onValueChange={(v) => setInquiryType(v as "personal" | "corporate")}>
-                <SelectTrigger id="inquiry-type">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="personal">개인 코칭</SelectItem>
-                  <SelectItem value="corporate">기업 코칭</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">{t("home.inquiry.form.name")}</Label>
+                <Input 
+                  id="name" 
+                  name="name" 
+                  required 
+                  placeholder={t("home.inquiry.form.namePlaceholder")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="email">{t("home.inquiry.form.email")}</Label>
+                <Input 
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  required 
+                  placeholder={t("home.inquiry.form.emailPlaceholder")}
+                />
+              </div>
             </div>
-            
-            <div>
-              <Label htmlFor="name">이름 *</Label>
-              <Input id="name" name="name" required />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone">{t("home.inquiry.form.phone")}</Label>
+                <Input 
+                  id="phone" 
+                  name="phone" 
+                  placeholder={t("home.inquiry.form.phonePlaceholder")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="type">{t("home.inquiry.form.type")}</Label>
+                <Select value={inquiryType} onValueChange={(value: any) => setInquiryType(value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="personal">{t("home.inquiry.form.typePersonal")}</SelectItem>
+                    <SelectItem value="corporate">{t("home.inquiry.form.typeCorporate")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            
-            <div>
-              <Label htmlFor="email">이메일 *</Label>
-              <Input id="email" name="email" type="email" required />
-            </div>
-            
-            <div>
-              <Label htmlFor="phone">전화번호</Label>
-              <Input id="phone" name="phone" type="tel" />
-            </div>
-            
-            <div>
-              <Label htmlFor="message">문의 내용 *</Label>
+
+            <div className="space-y-2">
+              <Label htmlFor="message">{t("home.inquiry.form.message")}</Label>
               <Textarea 
                 id="message" 
                 name="message" 
                 required 
-                rows={5}
-                className="resize-none"
+                rows={6}
+                placeholder={t("home.inquiry.form.messagePlaceholder")}
               />
             </div>
-            
-            <div className="flex gap-2 justify-end">
-              <Button type="button" variant="outline" onClick={() => setIsInquiryOpen(false)}>
-                취소
-              </Button>
-              <Button type="submit" disabled={createInquiryMutation.isPending}>
-                {createInquiryMutation.isPending ? "전송 중..." : "문의하기"}
-              </Button>
-            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={createInquiryMutation.isPending}
+            >
+              {createInquiryMutation.isPending 
+                ? t("home.inquiry.form.submitting") 
+                : t("home.inquiry.form.submit")}
+            </Button>
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Footer */}
+      <footer className="bg-muted py-12">
+        <div className="container">
+          <div className="text-center text-muted-foreground">
+            <p>&copy; 2026 AI Coaching. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -104,3 +104,47 @@ export const activityLogs = mysqlTable("activityLogs", {
 
 export type ActivityLog = typeof activityLogs.$inferSelect;
 export type InsertActivityLog = typeof activityLogs.$inferInsert;
+
+/**
+ * 콘텐츠 섹션 테이블 (다국어 지원)
+ * 개인 코칭 및 기업 코칭 섹션의 제목과 설명을 저장합니다.
+ */
+export const contentSections = mysqlTable("contentSections", {
+  id: int("id").autoincrement().primaryKey(),
+  sectionType: mysqlEnum("sectionType", ["personal", "corporate"]).notNull().unique(),
+  titleKo: varchar("titleKo", { length: 200 }).notNull(),
+  titleZh: varchar("titleZh", { length: 200 }).notNull(),
+  titleEn: varchar("titleEn", { length: 200 }).notNull(),
+  descriptionKo: text("descriptionKo").notNull(),
+  descriptionZh: text("descriptionZh").notNull(),
+  descriptionEn: text("descriptionEn").notNull(),
+  displayOrder: int("displayOrder").default(0).notNull(),
+  isActive: mysqlEnum("isActive", ["active", "inactive"]).default("active").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ContentSection = typeof contentSections.$inferSelect;
+export type InsertContentSection = typeof contentSections.$inferInsert;
+
+/**
+ * 콘텐츠 항목 테이블 (다국어 지원)
+ * 각 섹션의 하위 항목(아이콘, 제목, 내용)을 저장합니다.
+ */
+export const contentItems = mysqlTable("contentItems", {
+  id: int("id").autoincrement().primaryKey(),
+  sectionId: int("sectionId").notNull(), // contentSections.id 참조
+  iconName: varchar("iconName", { length: 50 }).notNull(),
+  titleKo: varchar("titleKo", { length: 200 }).notNull(),
+  titleZh: varchar("titleZh", { length: 200 }).notNull(),
+  titleEn: varchar("titleEn", { length: 200 }).notNull(),
+  contentKo: text("contentKo").notNull(),
+  contentZh: text("contentZh").notNull(),
+  contentEn: text("contentEn").notNull(),
+  displayOrder: int("displayOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ContentItem = typeof contentItems.$inferSelect;
+export type InsertContentItem = typeof contentItems.$inferInsert;
