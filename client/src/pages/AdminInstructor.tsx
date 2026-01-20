@@ -5,19 +5,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Upload, Loader2 } from "lucide-react";
 
 export default function AdminInstructor() {
-  const [name, setName] = useState("");
-  const [title, setTitle] = useState("");
-  const [bio, setBio] = useState("");
+  // Multilingual fields
+  const [nameKo, setNameKo] = useState("");
+  const [nameZh, setNameZh] = useState("");
+  const [nameEn, setNameEn] = useState("");
+  const [titleKo, setTitleKo] = useState("");
+  const [titleZh, setTitleZh] = useState("");
+  const [titleEn, setTitleEn] = useState("");
+  const [bioKo, setBioKo] = useState("");
+  const [bioZh, setBioZh] = useState("");
+  const [bioEn, setBioEn] = useState("");
+  const [expertiseKo, setExpertiseKo] = useState("");
+  const [expertiseZh, setExpertiseZh] = useState("");
+  const [expertiseEn, setExpertiseEn] = useState("");
+  
+  // Other fields
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [expertise, setExpertise] = useState("");
   const [profileLink, setProfileLink] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>("");
 
   const instructorsQuery = trpc.instructor.getAll.useQuery();
   const updateInstructorMutation = trpc.instructor.update.useMutation({
@@ -34,7 +46,6 @@ export default function AdminInstructor() {
       toast.success("강사 사진이 업데이트되었습니다.");
       instructorsQuery.refetch();
       setPhotoFile(null);
-      setPhotoPreview(null);
     },
     onError: () => {
       toast.error("강사 사진 업로드에 실패했습니다.");
@@ -45,14 +56,22 @@ export default function AdminInstructor() {
 
   useEffect(() => {
     if (instructor) {
-      setName(instructor.name);
-      setTitle(instructor.title || "");
-      setBio(instructor.bio || "");
+      setNameKo(instructor.nameKo || "");
+      setNameZh(instructor.nameZh || "");
+      setNameEn(instructor.nameEn || "");
+      setTitleKo(instructor.titleKo || "");
+      setTitleZh(instructor.titleZh || "");
+      setTitleEn(instructor.titleEn || "");
+      setBioKo(instructor.bioKo || "");
+      setBioZh(instructor.bioZh || "");
+      setBioEn(instructor.bioEn || "");
+      setExpertiseKo(instructor.expertiseKo || "");
+      setExpertiseZh(instructor.expertiseZh || "");
+      setExpertiseEn(instructor.expertiseEn || "");
       setEmail(instructor.email || "");
       setPhone(instructor.phone || "");
-      setExpertise(instructor.expertise || "");
       setProfileLink(instructor.profileLink || "");
-      setPhotoPreview(instructor.photoUrl || null);
+      setPhotoPreview(instructor.photoUrl || "");
     }
   }, [instructor]);
 
@@ -88,12 +107,20 @@ export default function AdminInstructor() {
 
     await updateInstructorMutation.mutateAsync({
       id: instructor.id,
-      name,
-      title,
-      bio,
+      nameKo,
+      nameZh,
+      nameEn,
+      titleKo,
+      titleZh,
+      titleEn,
+      bioKo,
+      bioZh,
+      bioEn,
+      expertiseKo,
+      expertiseZh,
+      expertiseEn,
       email,
       phone,
-      expertise,
       profileLink,
     });
   };
@@ -107,86 +134,210 @@ export default function AdminInstructor() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">강사 정보 관리</h1>
-        <p className="text-muted-foreground mt-2">강사 프로필 정보를 수정합니다.</p>
-      </div>
+    <div className="container max-w-4xl py-8">
+      <h1 className="text-3xl font-bold mb-8">강사 정보 관리</h1>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Photo Upload Card */}
+      <div className="grid gap-6">
+        {/* Photo Upload Section */}
         <Card>
           <CardHeader>
             <CardTitle>강사 사진</CardTitle>
-            <CardDescription>강사 프로필 사진을 업로드합니다.</CardDescription>
+            <CardDescription>강사 프로필 사진을 업로드하세요</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col items-center gap-4">
+          <CardContent>
+            <div className="flex flex-col gap-4">
               {photoPreview && (
-                <img
-                  src={photoPreview}
-                  alt="강사 사진 미리보기"
-                  className="w-48 h-48 rounded-lg object-cover shadow-md"
-                />
+                <div className="flex justify-center">
+                  <img
+                    src={photoPreview}
+                    alt="강사 사진"
+                    className="w-48 h-48 object-cover rounded-lg"
+                  />
+                </div>
               )}
-              <div className="w-full">
-                <Label htmlFor="photo">사진 선택</Label>
-                <Input
-                  id="photo"
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoChange}
-                  className="mt-1"
-                />
-              </div>
-              {photoFile && (
+              <div className="flex gap-4 items-end">
+                <div className="flex-1">
+                  <Label htmlFor="photo">사진 선택</Label>
+                  <Input
+                    id="photo"
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                  />
+                </div>
                 <Button
                   onClick={handlePhotoUpload}
-                  disabled={uploadPhotoMutation.isPending}
-                  className="w-full"
+                  disabled={!photoFile || uploadPhotoMutation.isPending}
                 >
                   {uploadPhotoMutation.isPending ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       업로드 중...
                     </>
                   ) : (
                     <>
-                      <Upload className="mr-2 h-4 w-4" />
+                      <Upload className="w-4 h-4 mr-2" />
                       사진 업로드
                     </>
                   )}
                 </Button>
-              )}
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Basic Info Card */}
+        {/* Multilingual Information Section */}
         <Card>
           <CardHeader>
-            <CardTitle>기본 정보</CardTitle>
-            <CardDescription>강사의 기본 정보를 입력합니다.</CardDescription>
+            <CardTitle>강사 기본 정보 (다국어)</CardTitle>
+            <CardDescription>
+              강사 정보를 한국어, 중국어, 영어로 입력하세요
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="ko" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="ko">한국어</TabsTrigger>
+                <TabsTrigger value="zh">中文</TabsTrigger>
+                <TabsTrigger value="en">English</TabsTrigger>
+              </TabsList>
+
+              {/* Korean Tab */}
+              <TabsContent value="ko" className="space-y-4">
+                <div>
+                  <Label htmlFor="nameKo">이름 (한국어)</Label>
+                  <Input
+                    id="nameKo"
+                    value={nameKo}
+                    onChange={(e) => setNameKo(e.target.value)}
+                    placeholder="예: 홍길동"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="titleKo">직함 (한국어)</Label>
+                  <Input
+                    id="titleKo"
+                    value={titleKo}
+                    onChange={(e) => setTitleKo(e.target.value)}
+                    placeholder="예: AI 코칭 전문가"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="bioKo">소개 (한국어)</Label>
+                  <Textarea
+                    id="bioKo"
+                    value={bioKo}
+                    onChange={(e) => setBioKo(e.target.value)}
+                    placeholder="강사 소개를 입력하세요"
+                    rows={5}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="expertiseKo">전문분야 (한국어)</Label>
+                  <Textarea
+                    id="expertiseKo"
+                    value={expertiseKo}
+                    onChange={(e) => setExpertiseKo(e.target.value)}
+                    placeholder="전문분야를 입력하세요"
+                    rows={3}
+                  />
+                </div>
+              </TabsContent>
+
+              {/* Chinese Tab */}
+              <TabsContent value="zh" className="space-y-4">
+                <div>
+                  <Label htmlFor="nameZh">姓名 (中文)</Label>
+                  <Input
+                    id="nameZh"
+                    value={nameZh}
+                    onChange={(e) => setNameZh(e.target.value)}
+                    placeholder="例如: 洪吉东"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="titleZh">职位 (中文)</Label>
+                  <Input
+                    id="titleZh"
+                    value={titleZh}
+                    onChange={(e) => setTitleZh(e.target.value)}
+                    placeholder="例如: AI教练专家"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="bioZh">简介 (中文)</Label>
+                  <Textarea
+                    id="bioZh"
+                    value={bioZh}
+                    onChange={(e) => setBioZh(e.target.value)}
+                    placeholder="请输入讲师简介"
+                    rows={5}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="expertiseZh">专业领域 (中文)</Label>
+                  <Textarea
+                    id="expertiseZh"
+                    value={expertiseZh}
+                    onChange={(e) => setExpertiseZh(e.target.value)}
+                    placeholder="请输入专业领域"
+                    rows={3}
+                  />
+                </div>
+              </TabsContent>
+
+              {/* English Tab */}
+              <TabsContent value="en" className="space-y-4">
+                <div>
+                  <Label htmlFor="nameEn">Name (English)</Label>
+                  <Input
+                    id="nameEn"
+                    value={nameEn}
+                    onChange={(e) => setNameEn(e.target.value)}
+                    placeholder="e.g., John Doe"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="titleEn">Title (English)</Label>
+                  <Input
+                    id="titleEn"
+                    value={titleEn}
+                    onChange={(e) => setTitleEn(e.target.value)}
+                    placeholder="e.g., AI Coaching Expert"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="bioEn">Bio (English)</Label>
+                  <Textarea
+                    id="bioEn"
+                    value={bioEn}
+                    onChange={(e) => setBioEn(e.target.value)}
+                    placeholder="Enter instructor bio"
+                    rows={5}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="expertiseEn">Expertise (English)</Label>
+                  <Textarea
+                    id="expertiseEn"
+                    value={expertiseEn}
+                    onChange={(e) => setExpertiseEn(e.target.value)}
+                    placeholder="Enter areas of expertise"
+                    rows={3}
+                  />
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        {/* Contact Information Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>연락처 및 기타 정보</CardTitle>
+            <CardDescription>이메일, 전화번호, 프로필 링크를 입력하세요</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="name">이름 *</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="강사 이름"
-              />
-            </div>
-            <div>
-              <Label htmlFor="title">직함</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="예: AI 코칭 전문가"
-              />
-            </div>
             <div>
               <Label htmlFor="email">이메일</Label>
               <Input
@@ -201,7 +352,6 @@ export default function AdminInstructor() {
               <Label htmlFor="phone">전화번호</Label>
               <Input
                 id="phone"
-                type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="010-1234-5678"
@@ -211,65 +361,31 @@ export default function AdminInstructor() {
               <Label htmlFor="profileLink">프로필 링크</Label>
               <Input
                 id="profileLink"
-                type="url"
                 value={profileLink}
                 onChange={(e) => setProfileLink(e.target.value)}
-                placeholder="https://example.com"
+                placeholder="https://example.com/profile"
               />
-              <p className="text-xs text-muted-foreground mt-1">
-                강사 소개 섹션에 표시될 외부 링크 (선택사항)
-              </p>
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      {/* Detailed Info Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>상세 정보</CardTitle>
-          <CardDescription>강사의 소개 및 전문 분야를 입력합니다.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="bio">소개</Label>
-            <Textarea
-              id="bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              rows={5}
-              className="resize-none"
-              placeholder="강사 소개를 작성하세요..."
-            />
-          </div>
-          <div>
-            <Label htmlFor="expertise">전문 분야</Label>
-            <Textarea
-              id="expertise"
-              value={expertise}
-              onChange={(e) => setExpertise(e.target.value)}
-              rows={3}
-              className="resize-none"
-              placeholder="전문 분야를 쉼표로 구분하여 입력하세요. 예: AI 코칭, 기업 컨설팅, 실행형 AI"
-            />
-          </div>
-          <div className="flex justify-end">
-            <Button
-              onClick={handleSaveInfo}
-              disabled={updateInstructorMutation.isPending || !name}
-            >
-              {updateInstructorMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  저장 중...
-                </>
-              ) : (
-                "정보 저장"
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Save Button */}
+        <Button
+          onClick={handleSaveInfo}
+          disabled={updateInstructorMutation.isPending}
+          size="lg"
+          className="w-full"
+        >
+          {updateInstructorMutation.isPending ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              저장 중...
+            </>
+          ) : (
+            "강사 정보 저장"
+          )}
+        </Button>
+      </div>
     </div>
   );
 }

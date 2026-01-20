@@ -35,6 +35,7 @@ export const translations = {
       instructor: {
         badge: "강사 소개",
         viewProfile: "상세 프로필 보기",
+        expertise: "전문 분야",
       },
       inquiry: {
         title: "문의하기",
@@ -139,6 +140,7 @@ export const translations = {
       instructor: {
         badge: "讲师介绍",
         viewProfile: "查看详细资料",
+        expertise: "专业领域",
       },
       inquiry: {
         title: "咨询",
@@ -243,6 +245,7 @@ export const translations = {
       instructor: {
         badge: "Instructor",
         viewProfile: "View Detailed Profile",
+        expertise: "Areas of Expertise",
       },
       inquiry: {
         title: "Contact Us",

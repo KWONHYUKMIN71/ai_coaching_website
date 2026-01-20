@@ -37,12 +37,27 @@ export const appRouter = router({
     update: protectedProcedure
       .input(z.object({
         id: z.number(),
+        // Legacy fields
         name: z.string().optional(),
         title: z.string().optional(),
         bio: z.string().optional(),
+        expertise: z.string().optional(),
+        // Multilingual fields
+        nameKo: z.string().optional(),
+        nameZh: z.string().optional(),
+        nameEn: z.string().optional(),
+        titleKo: z.string().optional(),
+        titleZh: z.string().optional(),
+        titleEn: z.string().optional(),
+        bioKo: z.string().optional(),
+        bioZh: z.string().optional(),
+        bioEn: z.string().optional(),
+        expertiseKo: z.string().optional(),
+        expertiseZh: z.string().optional(),
+        expertiseEn: z.string().optional(),
+        // Other fields
         email: z.string().optional(),
         phone: z.string().optional(),
-        expertise: z.string().optional(),
         profileLink: z.string().optional(),
       }))
       .mutation(async ({ input }) => {

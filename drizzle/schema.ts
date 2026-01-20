@@ -31,14 +31,29 @@ export type InsertUser = typeof users.$inferInsert;
  */
 export const instructors = mysqlTable("instructors", {
   id: int("id").autoincrement().primaryKey(),
-  name: varchar("name", { length: 100 }).notNull(),
+  // Legacy fields (kept for backward compatibility)
+  name: varchar("name", { length: 100 }),
   title: varchar("title", { length: 200 }),
   bio: text("bio"),
+  expertise: text("expertise"),
+  // Multilingual fields
+  nameKo: varchar("nameKo", { length: 100 }),
+  nameZh: varchar("nameZh", { length: 100 }),
+  nameEn: varchar("nameEn", { length: 100 }),
+  titleKo: varchar("titleKo", { length: 200 }),
+  titleZh: varchar("titleZh", { length: 200 }),
+  titleEn: varchar("titleEn", { length: 200 }),
+  bioKo: text("bioKo"),
+  bioZh: text("bioZh"),
+  bioEn: text("bioEn"),
+  expertiseKo: text("expertiseKo"),
+  expertiseZh: text("expertiseZh"),
+  expertiseEn: text("expertiseEn"),
+  // Other fields
   photoUrl: varchar("photoUrl", { length: 500 }),
   photoKey: varchar("photoKey", { length: 500 }),
   email: varchar("email", { length: 320 }),
   phone: varchar("phone", { length: 50 }),
-  expertise: text("expertise"),
   profileLink: varchar("profileLink", { length: 500 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

@@ -265,9 +265,13 @@ export default function Home() {
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
                 <Badge className="mb-4" variant="secondary">{t("home.instructor.badge")}</Badge>
-                <h2 className="text-4xl font-bold mb-4">{instructor.name}</h2>
-                {instructor.title && (
-                  <p className="text-xl text-muted-foreground mb-4">{instructor.title}</p>
+                <h2 className="text-4xl font-bold mb-4">
+                  {language === 'ko' ? instructor.nameKo : language === 'zh' ? instructor.nameZh : instructor.nameEn}
+                </h2>
+                {(language === 'ko' ? instructor.titleKo : language === 'zh' ? instructor.titleZh : instructor.titleEn) && (
+                  <p className="text-xl text-muted-foreground mb-4">
+                    {language === 'ko' ? instructor.titleKo : language === 'zh' ? instructor.titleZh : instructor.titleEn}
+                  </p>
                 )}
               </div>
 
@@ -276,23 +280,25 @@ export default function Home() {
                   <div className="flex-shrink-0">
                     <img 
                       src={instructor.photoUrl} 
-                      alt={instructor.name}
+                      alt={language === 'ko' ? instructor.nameKo || '' : language === 'zh' ? instructor.nameZh || '' : instructor.nameEn || ''}
                       className="w-64 h-64 object-cover rounded-lg shadow-lg"
                     />
                   </div>
                 )}
                 
                 <div className="flex-1">
-                  {instructor.bio && (
+                  {(language === 'ko' ? instructor.bioKo : language === 'zh' ? instructor.bioZh : instructor.bioEn) && (
                     <p className="text-lg text-muted-foreground mb-6 whitespace-pre-wrap">
-                      {instructor.bio}
+                      {language === 'ko' ? instructor.bioKo : language === 'zh' ? instructor.bioZh : instructor.bioEn}
                     </p>
                   )}
                   
-                  {instructor.expertise && (
+                  {(language === 'ko' ? instructor.expertiseKo : language === 'zh' ? instructor.expertiseZh : instructor.expertiseEn) && (
                     <div className="mb-6">
-                      <h3 className="text-lg font-semibold mb-2">전문 분야</h3>
-                      <p className="text-muted-foreground">{instructor.expertise}</p>
+                      <h3 className="text-lg font-semibold mb-2">{t("home.instructor.expertise")}</h3>
+                      <p className="text-muted-foreground">
+                        {language === 'ko' ? instructor.expertiseKo : language === 'zh' ? instructor.expertiseZh : instructor.expertiseEn}
+                      </p>
                     </div>
                   )}
 
